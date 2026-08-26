@@ -22,6 +22,7 @@ Reference material for scripting against OgreBot, ISXOgre, and OgreCraft. These 
 ## Guides
 
 - [Coding Practices](coding-practices.md) — Naming conventions and code style
+- [Production Script Patterns](production-patterns.md) — Real patterns, idioms, and known bugs distilled from the live Scripts folder (secondary/informational — API docs remain authoritative)
 
 ## Examples
 
