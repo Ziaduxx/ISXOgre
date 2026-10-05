@@ -5,7 +5,7 @@ This document distills coding patterns from the live scripts folder at `C:\Progr
 **Method.**
 - **Corpus:** every `.iss` file in the Scripts folder, excluding `eq2a/`, `EQ2Craft/`, `Eq2JCommon/`, `EQ2OgreCodex/`, `init-session/`, `init-uplink/`, `ISBoxer Images/`, root-level `ISBOXER*` files (matched case-insensitively), `.venv/` and `.git/` folders. That leaves **1,066 files**, about 8 MB.
 - **Full read:** all 1,066 files were read by 13 independent reviewers, about 82 files each. This was a full read, not a sample.
-- **Validation:** counts marked "corpus-wide" were re-checked with grep across all filtered files. One file that turned out to be a saved web page was excluded from the counts and has since been deleted.
+- **Validation:** counts marked "corpus-wide" were re-checked with grep across all filtered files. One file that turned out to be a saved web page was excluded from the counts and has since been deleted, leaving 1,065 files. The §6 bug counts were refreshed after the October 2026 fixes; "N fixed" means instances repaired since the survey.
 - **How to weight evidence:** the corpus has heavy copy-paste. One author often duplicates a whole file across expansions, or into both `EQ2OgreBot\...\Default` and `EQ2RAW\IC`. A raw file count can therefore overstate how widespread a convention is. Where it matters, this document says how many independent authors use a pattern.
 
 ---
@@ -235,18 +235,18 @@ Each of these appears independently in several files. Counts are corpus-wide.
 
 | Bug | Files | What happens |
 |---|---|---|
-| `${Args.Expand}` used in `main(int _StartingPoint=0)` with no `... Args` | 33 | Expands to empty, so arguments are silently dropped. |
-| `HandleNamed()` reads `${_NamedNpc}`, which is the caller's parameter and out of scope | 33 | The "already dead" check tests an empty name. |
-| `CheckZoneResetStatus` (a `function:bool`) returns TRUE only on the "wait" path | ~15 (same template) | When the zone is already resettable the function returns nothing, and the caller's `if !${Return}` aborts. |
-| `Heroic_3_Zone_Name` referenced but never declared | ~24 (39 use it, 15 declare it) | That difficulty branch never matches. |
-| Braceless `if` guarding a multi-line `raw_main` body | many, mostly Kordulek | Only the first statement is conditional. `RunScript` and the wait loop run unconditionally. **Always brace multi-statement `if` bodies.** |
+| `${Args.Expand}` used in `main(int _StartingPoint=0)` with no `... Args` | 0 (33 fixed) | Expands to empty, so arguments are silently dropped. Fixed across the zone-reset template copies in `EQ2RAW\IC`; avoid in new code. |
+| `HandleNamed()` reads `${_NamedNpc}`, which is the caller's parameter and out of scope | 0 (33 fixed) | The "already dead" check tests an empty name. Fixed: `HandleNamed` now takes `string _NamedNPC` and callers pass it. |
+| `CheckZoneResetStatus` (a `function:bool`) returns TRUE only on the "wait" path | 1 (32 fixed) | When the zone is already resettable the function returns nothing, and the caller's `if !${Return}` aborts. Remaining: the parameter version in `IC_Helper_Extended.iss`. |
+| `Heroic_3_Zone_Name` referenced but never declared | 24 | That difficulty branch never matches (harmless dead code). |
+| Braceless `if` guarding a multi-line `raw_main` body | 25 (8 fixed) | Only the first statement is conditional. `RunScript` and the wait loop run unconditionally. Remaining: Scars of Destruction (12), Ballads of Zimara (12), Chains of Eternity (1); Rage of Cthurath is fixed. **Always brace multi-statement `if` bodies.** |
 | Dead "placeholder" atoms (`Text.Find["placeholder"]`, attach commented out) | 15 | Unfinished template scaffolding; the mechanic is not handled. |
-| Stray character at the end of a coordinate string (`"...-215.163055w"`, `...}"`) | 14 | Malformed coordinate. |
+| Stray character at the end of a coordinate string (`"...-215.163055w"`, `...}"`) | 13 (1 fixed) | Malformed coordinate. |
 | `OgreIH:Set_Debug_Mode[TRUE]` missing the `Obj_` prefix | 18 | References a nonexistent object; debug mode never turns on. |
 | `#include` of misspelled `IC_Helper_Extened.iss` | 9 | A hard `#include` of a file that doesn't exist. The real file is `IC_Helper_Extended.iss`. |
 | Missing closing quote on `#includeoptional "...aod_zone_routes.iss` | several | `#includeoptional` hides the failure; the target folder `Scripts/ZoneRoutes/` doesn't exist anyway. |
 | Blocking `Messagebox` in automated flow | 32 | Halts the script until a human clicks OK. Sometimes intentional (a manual step), but it can stall a group. |
-| Duplicate `method` names in one objectdef (`ClearUI` in `Object_EQ2Chars.iss` and `Object_UplinkInfo.iss`) | 2+ | The second definition silently wins. |
+| Duplicate `method` names in one objectdef (`ClearUI` in `Object_EQ2Chars.iss` and `Object_UplinkInfo.iss`) | 2 | The second definition silently wins. |
 | Arithmetic in `:Set[${A} - ${B}]` without `Math.Calc` | several | Likely stores the literal expression text, not the result. |
 | `${NamedNPC}` (no underscore) where the parameter is `_NamedNPC` | several | The wait-while-alive loop never runs. |
 | Wrong atom name in `AttachAtom` (attaches `ChestSpawned`, defines `ActorSpawned`) | 2+ | The handler never fires, with no error. |
