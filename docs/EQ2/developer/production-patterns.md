@@ -235,7 +235,7 @@ Each of these appears independently in several files. Counts are corpus-wide.
 
 | Bug | Files | What happens |
 |---|---|---|
-| `function atexit()` instead of `atom atexit()` | 54 (vs 312 correct) | Only an **atom** named `atexit` is auto-invoked at script end (the corpus's own `BarrageBulwark.iss` comment confirms it). Cleanup silently never runs. |
+| `call` inside `atexit` | 17 (15 are `call Obj_Kord.HO "Disable" TRUE`) | `atexit` always runs as an **atom**, whichever keyword is used (see the note below the table), and atoms cannot use delays. The guide states that atoms cannot use `call`; not yet confirmed in-game. If true, that cleanup step silently doesn't run. Prefer plain `oc !ci ...` commands in `atexit`, or `Script:QueueCommand`. |
 | `${Args.Expand}` used in `main(int _StartingPoint=0)` with no `... Args` | 33 | Expands to empty, so arguments are silently dropped. |
 | `HandleNamed()` reads `${_NamedNpc}`, which is the caller's parameter and out of scope | 33 | The "already dead" check tests an empty name. |
 | `CheckZoneResetStatus` (a `function:bool`) returns TRUE only on the "wait" path | ~15 (same template) | When the zone is already resettable the function returns nothing, and the caller's `if !${Return}` aborts. |
@@ -255,7 +255,7 @@ Each of these appears independently in several files. Counts are corpus-wide.
 
 **Copy-paste text tells:** many files print "Chanter's repair bot not available, trying your priests." three times in a row for shaman, cleric and druid. Failure messages often name the wrong boss, and headers name the wrong script. When copying a file, update every self-referential string.
 
-**Still unverified:** several files `call` functions from inside an `atom` (including `atexit`). In LavishScript, `call` normally belongs in a function/thread context, so this may not work. Verify against the ISXEQ2/LavishScript guide before relying on it.
+**`function atexit()` vs `atom atexit()` is not a bug.** 54 files declare `function atexit()` and 312 declare `atom atexit()`. Both run at script end: the LavishScript 1.67 release notes say *"'atexit' is now atomic. If it is defined as a function, it will automatically be converted to an atom."* What matters is the **body**, because it always runs atomically. `wait`/`waitframe` are documented errors there (corpus-wide, 0 atexit bodies use them), and `call` is the open question in the table above. Prefer `atom atexit()` in new code, since it states the real behavior.
 
 ---
 
