@@ -24,7 +24,7 @@ OgreBot uses an [alias system](aliases.md) to reference characters by role inste
 
 ### Communication
 
-You can use [cross-session commands](../developer/cross-session-commands.md) to control your characters.
+You can use cross-session commands to control your characters.
 
 ### Saving Settings
 
